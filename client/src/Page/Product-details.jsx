@@ -2,10 +2,52 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography, Paper, Grid, Avatar } from "@mui/material";
 import { useParams } from "react-router-dom";
 import productApi from "../Api/productApi";
+import AddToCardForm from "../Form/Card/AddToCardForm";
+import { addToCard, addToCardProduct, fetchCartItems } from "../redux/Card/cardSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { cardItemsSelector } from "../redux/Card/selectors";
+
 
 const ProductDetails = () => {
   const { id } = useParams(); // Lấy ID từ URL
   const [product, setProduct] = useState("");
+  const dispatch = useDispatch()
+
+// const currentQuantityInCart = cartItems.find(item=> item.id === item. );
+
+const cartItem = useSelector(cardItemsSelector)
+// Debug để kiểm tra cartItem và product._id
+console.log("Cart Items:", cartItem);
+console.log("Product ID:", product._id);
+
+// Lấy số lượng hiện tại trong giỏ hàng của sản phẩm hiện tại
+const currentQuantityInCart = cartItem
+  .filter(item => String(item.productId) === String(product._id)) // Lọc theo productId
+  .reduce((acc, item) => acc + (item.quantity || 0), 0); // Cộng quantity của các item đã lọc
+
+console.log("Current Quantity in Cart:", currentQuantityInCart);
+
+const handleAddToCard = async({quantity})=>{
+  console.log("Product details:", product);
+  try {
+    const responseData = await addToCardProduct(product._id,quantity);
+    
+    
+    if(responseData&&responseData.success){
+      const action = addToCard({
+        id: product._id,
+        product,
+        quantity: quantity,
+        
+      });
+
+      dispatch(action);
+      dispatch(fetchCartItems())
+    }
+  } catch (error) {
+    console.error("Failed to add product to cart", error);
+  }
+}
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -27,6 +69,8 @@ const ProductDetails = () => {
     );
   }
 
+
+  
   return (
     <Box sx={{ mt: 5 }}>
       <Paper elevation={3} sx={{ padding: 4 }}>
@@ -59,6 +103,7 @@ const ProductDetails = () => {
               <Typography>
                 Expiry Date: {product.more_details.expiry_date}
               </Typography>
+            <AddToCardForm currentQuantityInCart={currentQuantityInCart}  stock={(product.stock)}   onSubmit={handleAddToCard} />
             </Box>
           </Grid>
         </Grid>

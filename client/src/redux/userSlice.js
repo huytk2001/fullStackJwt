@@ -41,6 +41,7 @@ export const LogoutUser = createAsyncThunk(
       localStorage.removeItem("accessToken");
       localStorage.removeItem("currentUser");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("persist:root");
       return data.data;
     } catch (error) {
       return rejectWithValue(error.response.data); // Trả lỗi nếu thất bại

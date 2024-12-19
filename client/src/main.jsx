@@ -11,7 +11,7 @@ import { Container } from "@mui/material";
 import { RouterProvider } from "react-router-dom";
 import router from "./Route";
 import { Provider } from "react-redux";
-import { store, persistor } from "./app/store";
+import { store, persist } from "./app/store";
 import { PersistGate } from "redux-persist/integration/react";
 // index.js / main.js
 import axiosClient from "./Api/axiosClient";
@@ -24,7 +24,7 @@ if (token) {
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
+    <PersistGate loading={null} persistor={persist}>
       <Container>
         <RouterProvider router={router}></RouterProvider>
       </Container>

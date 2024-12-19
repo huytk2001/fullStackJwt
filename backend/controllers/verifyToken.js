@@ -6,31 +6,34 @@ const auth = async(request, response, next) => {
             request.cookies.accessToken ||
             request.headers.authorization.split(" ")[1] ||
             request.split(" ")[1] ||
-            request.headers.split(" ")[1] ||
-            req.headers["Authorization"];
+            request.headers.split(" ")[1];
 
         if (!token) {
             return response.status(401).json({
-                message: "Provide token",
-            });
-        }
-
-        const decode = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-        if (!decode) {
-            return response.status(401).json({
-                message: "unauthorized access",
+                message: "Vui lòng cung cấp token",
                 error: true,
                 success: false,
             });
         }
 
-        request.userId = decode.id;
+        // Wrap jwt.verify trong một Promise
+        const decode = await new Promise((resolve, reject) => {
+            jwt.verify(
+                token,
+                process.env.ACCESS_TOKEN_SECRET,
+                (err, decodedToken) => {
+                    if (err) reject(err);
+                    else resolve(decodedToken);
+                }
+            );
+        });
 
+        request.userId = decode.id;
         next();
     } catch (error) {
-        return response.status(500).json({
-            message: "You have not login", ///error.message || error,
+        console.error("Lỗi JWT:", error.message);
+        return response.status(401).json({
+            message: "Truy cập không hợp lệ - Token không hợp lệ hoặc đã hết hạn",
             error: true,
             success: false,
         });
@@ -38,8 +41,12 @@ const auth = async(request, response, next) => {
 };
 // const auth = (req, res, next) => {
 //     //ACCESS TOKEN FROM HEADER, REFRESH TOKEN FROM COOKIE
-//     const token = req.headers.token || req.headers["Authorization"];
+//     const token =
+//         req.headers.token ||
+//         request.cookies.accessToken ||
+//         req.headers["Authorization"];
 //     const refreshToken = req.cookies.refreshToken;
+
 //     if (token) {
 //         const accessToken = token.split(" ")[1];
 //         jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -53,5 +60,4 @@ const auth = async(request, response, next) => {
 //         res.status(401).json("You're not authenticated");
 //     }
 // };
-
 export default auth;

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 
 const MODE = {
@@ -17,19 +17,28 @@ import {
   MenuList,
   MenuItem,
   Menu,
+  Badge,
 } from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
 import { Link, NavLink } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import { LogoutUser } from "../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Close, ShoppingCart } from "@mui/icons-material";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
+import { cartItemsCountSelector } from "../redux/Card/selectors";
+import { clearCart, fetchCartItems, removeFromCard,  } from "../redux/Card/cardSlice";
+import { persist } from "../app/store";
 Header.propTypes = {};
 
 function Header(props) {
   const currentUser = useSelector((state) => state.user.login.currentUser);
   const isLogginOut = useSelector((state) => state.user.logout.currentUser);
   const dispatch = useDispatch();
+  const negative = useNavigate();
+  const cardItemsCount = useSelector(cartItemsCountSelector);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const handleClose = (e) => {
@@ -38,6 +47,12 @@ function Header(props) {
     }
     setOpen(false);
   };
+  const handleCartClick = () => {
+    negative("card");
+  };
+  useEffect(() => {
+    dispatch(fetchCartItems()); // Fetch dữ liệu từ API
+  }, [dispatch]);
   // const const anchorRef = React.useRef(null);
   // let axiosJWT = axios.create();
   // const refreshToken = async () => {
@@ -51,28 +66,15 @@ function Header(props) {
   //   }
   // };
   const handleLogout = () => {
-    dispatch(LogoutUser()); // Ensure LogoutUser is defined in your Redux slice
+    dispatch(removeFromCard());
+    dispatch(clearCart())
+    persist.purge();
+    dispatch(LogoutUser());
+    negative("/");
+
+    // Ensure LogoutUser is defined in your Redux slice
   };
 
-  // axiosJWT.interceptors.request.use(
-  //   async (config) => {
-  //     let data = new Date();
-  //     const decodedToken = jwtDecode(currentUser?.accessToken);
-  //     if (decodedToken.exp < data.getTime() / 1000) {
-  //       const data = await refreshToken();
-  //       const refreshUser = {
-  //         ...currentUser,
-  //         accessToken: data.accessToken,
-  //       };
-  //       dispatch(LoginUser(refreshUser));
-  //       config.headers["token"] = "Bearer" + data.accessToken;
-  //     }
-  //     return config;
-  //   },
-  //   (error) => {
-  //     return Promise.reject(error);
-  //   }
-  // );
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -130,7 +132,7 @@ function Header(props) {
                 {(popupState) => (
                   <React.Fragment>
                     <Button variant="contained" {...bindTrigger(popupState)}>
-                      {/* {currentUser.user.username} */}
+                      <PersonIcon />
                     </Button>
                     <Menu {...bindMenu(popupState)}>
                       <MenuItem onClick={popupState.close}>Profile</MenuItem>
@@ -149,6 +151,20 @@ function Header(props) {
                 </Button>
               </NavLink>
             )}
+
+            <IconButton
+              size="large"
+              aria-label="show 4 new mails"
+              color="inherit"
+            >
+              <Badge
+                badgeContent={cardItemsCount}
+                color="error"
+                onClick={handleCartClick}
+              >
+                <ShoppingCart />
+              </Badge>
+            </IconButton>
           </Toolbar>
         </AppBar>
       </Box>

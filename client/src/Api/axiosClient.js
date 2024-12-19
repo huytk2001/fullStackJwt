@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { Axios } from "axios";
 // import { jwtDecode } from "jwt-decode";
 
 // Create Axios client
@@ -20,42 +20,18 @@ const refreshAccessToken = async(refreshToken) => {
         });
 
         const accessToken = response.data.data.accessToken;
+
         localStorage.setItem("accessToken", accessToken);
         return accessToken;
     } catch (error) {
         console.log(error);
     }
 };
-// Refresh Token Function
-// const refreshToken = async () => {
-//   try {
-//     console.log("Attempting to refresh token...");
-//     const res = await axios.post("/v1/auth/refresh", { withCredentials: true });
-//     console.log("New access token received:", res.data.accessToken);
-//     return res.data; // { accessToken: ..., refreshToken: ... }
-//   } catch (err) {
-//     console.error("Failed to refresh token:", err.message);
-//     return null;
-//   }
-// };
 
-// axiosClient.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem("accessToken");
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
 axiosClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("accessToken"); // Consistent key retrieval
         console.log("Retrieved Token:", token);
-
         if (token) {
             console.log("Current Token:", token);
             config.headers.Authorization = `Bearer ${token}`;
@@ -101,25 +77,40 @@ axiosClient.interceptors.request.use(
 //     console.error("Other errors:", error.message);
 //     return Promise.reject(error);
 //   }
-// );
-axios.interceptors.request.use(
+axiosClient.interceptors.response.use(
     (response) => {
+        console.log("Response received:", response); // Ghi log response
         return response;
     },
     async(error) => {
+        console.error("Response error:", error.message);
         let originRequest = error.config;
 
-        if (error.response.status === 401 && !originRequest.retry) {
+        if (
+            error.response &&
+            error.response.status === 401 &&
+            !originRequest.retry
+        ) {
+            console.log("Token expired, retry request...");
+
             originRequest.retry = true;
 
             const refreshToken = localStorage.getItem("refreshToken");
+            console.log("Refresh Token:", refreshToken);
 
             if (refreshToken) {
-                const newAccessToken = await refreshAccessToken(refreshToken);
+                try {
+                    const newAccessToken = await refreshAccessToken(refreshToken);
+                    console.log("Received new access token:", newAccessToken);
 
-                if (newAccessToken) {
-                    originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                    return axiosClient(originRequest);
+                    if (newAccessToken) {
+                        originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                        console.log("Retrying request with new token...");
+
+                        return axios(originRequest); // Retry request
+                    }
+                } catch (refreshErr) {
+                    console.error("Failed to refresh token:", refreshErr.message);
                 }
             }
         }
@@ -127,6 +118,65 @@ axios.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+// axios.interceptors.request.use(
+//     async(config) => {
+//         try {
+//             const token = localStorage.getItem("refreshToken");
+//             console.log("Refresh", token);
+
+//             if (token) {
+//                 const decodedToken = jwtDecode(token);
+//                 const currentTime = Math.floor(Date.now() / 1000);
+
+//                 // Kiểm tra token đã hết hạn chưa
+//                 if (decodedToken.exp < currentTime) {
+//                     console.log("Token đã hết hạn, đang làm mới...");
+//                     const newAccessToken = await refreshAccessToken(token);
+//                     if (newAccessToken) {
+//                         config.headers.Authorization = `Bearer ${newAccessToken}`;
+//                         return Axios(config);
+//                     }
+//                 } else {
+//                     config.headers["Authorization"] = "Bearer " + token;
+//                 }
+//             }
+//         } catch (error) {
+//             console.error("Lỗi giải mã token hoặc làm mới token:", error.message);
+//         }
+
+//         return config;
+//     },
+//     (err) => {
+//         console.error("Lỗi trong request:", err.message);
+//         return Promise.reject(err);
+//     }
+// );
+
+// axiosClient.interceptors.request.use(
+//     (response) => {
+//         return response;
+//     },
+//     async(error) => {
+//         let originRequest = error.config;
+
+//         if (error.response.status === 401 && !originRequest.retry) {
+//             originRequest.retry = true;
+
+//             const refreshToken = localStorage.getItem("refreshToken");
+
+//             if (refreshToken) {
+//                 const newAccessToken = await refreshAccessToken(refreshToken);
+
+//                 if (newAccessToken) {
+//                     originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+//                     return axiosClient(originRequest);
+//                 }
+//             }
+//         }
+
+//         return Promise.reject(error);
+//     }
+// );
 // axiosClient.interceptors.response.use(
 //   (response) => {
 //     // Xử lý phản hồi có nội dung

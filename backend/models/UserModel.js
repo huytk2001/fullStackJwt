@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -7,7 +8,7 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, "provide email"],
+      required: [true, "Provide email"],
       unique: true,
     },
     avatar: {
@@ -24,7 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "provide password"],
+      required: [true, "Provide password"],
     },
     isAdmin: {
       type: Boolean,
@@ -39,12 +40,6 @@ const userSchema = new mongoose.Schema(
       enum: ["Active", "Inactive", "Suspended"],
       default: "Active",
     },
-    address_details: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: "address",
-      },
-    ],
     address_details: [
       {
         type: mongoose.Schema.ObjectId,

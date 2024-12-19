@@ -5,6 +5,7 @@ import Home from "../Page/Home";
 import Register from "../Page/Register";
 import ListPageProducts from "../component/Product/ListPageProducts";
 import ProductDetails from "../Page/Product-details";
+import CartFeaTure from "../redux/Card/Card";
 
 const AuthLayout = () => {
   return <Outlet />;
@@ -34,6 +35,10 @@ export default createBrowserRouter([
           {
             element: <ProductDetails />,
             path: "product-details/:id", // Đặt ngang hàng với `ListPageProducts`
+          },
+          {
+            element: <CartFeaTure />,
+            path: "card", // Đặt ngang hàng với `ListPageProducts`
           },
         ],
       },

@@ -2,27 +2,28 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
-import userReducer from "../redux/userSlice";
 
-// Kết hợp reducer bằng combineReducers
+import userReducer from "../redux/userSlice";
+import cardReducer from "../redux/Card/cardSlice";
+
 const rootReducer = combineReducers({
   user: userReducer,
+  card: cardReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: ["user", "card"], // Persist cả user và card reducer
 };
 
-// Tạo persistedReducer bằng persistReducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// Tạo store với persisted reducer
 const store = configureStore({
   reducer: persistedReducer,
 });
 
-const persistor = persistStore(store);
+const persist = persistStore(store);
 
-export { store, persistor };
+export { store, persist };
 export default store;

@@ -98,7 +98,7 @@ const authController = {
             if (!refreshToken) return res.status(401).json("No refresh token found");
 
             // Verify token
-            const verifyToken = await jwt.verify(
+            const verifyToken = jwt.verify(
                 refreshToken,
                 process.env.REFRESH_TOKEN_SECRET
             );
@@ -141,7 +141,7 @@ const authController = {
     Logout: async(req, res) => {
         refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
         res.clearCookie("refreshToken");
-
+        res.clearCookie("accessToken");
         res.status(200).json("Logged out successfully!");
     },
 };
