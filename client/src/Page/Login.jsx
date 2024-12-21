@@ -7,6 +7,8 @@ import {  fetchUserDetail, LoginUser, setUserDetails } from "../redux/userSlice"
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
 import LoginFrom from "../Form/loginForm";
+import { fetchCartItems } from "../redux/Card/cardSlice";
+import { handleAddress } from "../redux/addreessSlice";
 Login.propTypes = {
   closeDialog: PropTypes.func,
 };
@@ -28,6 +30,8 @@ function Login(props) {
         negative("/");
         const userDetails = await fetchUserDetail()
         dispatch(setUserDetails(userDetails))
+        dispatch(fetchCartItems())
+        dispatch(handleAddress())
       } else {
         enqueueSnackbar("Login successful but no user data returned (204).", {
           variant: "info",

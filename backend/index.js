@@ -9,6 +9,7 @@ import productRoute from "./route/product.js";
 import categoryRoute from "./route/category.js";
 import cartRoute from "./route/cartRoute.js";
 import orderRoute from "./route/oderRoute.js";
+import addressRoute from "./route/addressRoute.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,6 +32,7 @@ app.use("/product", productRoute);
 app.use("/category", categoryRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/order", orderRoute);
+app.use("/api/address", addressRoute);
 mongoose
     .connect(URI)
     .then(() => {

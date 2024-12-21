@@ -3,6 +3,7 @@ import OrderModel from "../models/OrderModel.js"
 import CartProduct from "../models/CardProductModel.js"
 import UserModel from "../models/UserModel.js"
 import Stripe from "../config/stripe.js"
+import ProductModel from "../models/ProductModel.js"
 
 export const priceWithDiscount = (price, dis = 1) => {
     const discountAmount = Math.ceil(Number(price) * Number(dis) / 100)
@@ -61,6 +62,20 @@ const orderControllers = {
 
             const removeCartItems = await CartProduct.deleteMany({ userId: userId })
             const updatedUser = await UserModel.updateOne({ _id: userId }, { shopping_cart: [] })
+            for (const item of list_items) {
+                const productId = item.productId;
+                const quantityPurchased = item.quantity
+
+                // tim san pham va giam stock
+                const product = await ProductModel.findById(productId)
+                if (product) {
+                    console.log("Before update:", product.stock);
+                    product.stock -= item.quantity;
+                    console.log("After update:", product.stock);
+                    await product.save();
+
+                }
+            }
             return response.status(200).json({
                 message: "Order successfully",
                 error: false,
@@ -79,7 +94,12 @@ const orderControllers = {
     paymentController: async(request, response) => {
         try {
             const userId = request.userId // auth middleware
-            const { list_items, addressId } = request.body
+            const {
+                list_items,
+                addressId,
+                subTotalAmt,
+                totalAmt
+            } = request.body
 
             // Kiểm tra xem list_items có phải là mảng không và có phần tử hay không
             if (!Array.isArray(list_items) || list_items.length === 0) {
@@ -94,10 +114,10 @@ const orderControllers = {
 
             const line_items = list_items.map(item => {
                 const productData = {
-                    name: item.productId.name,
-                    images: item.productId.image,
+                    name: item.name,
+                    images: item.image,
                     metadata: {
-                        productId: item.productId._id
+                        productId: item._id
                     }
                 };
 
@@ -107,7 +127,7 @@ const orderControllers = {
                     price_data: {
                         currency: 'inr',
                         product_data: productData,
-                        unit_amount: priceWithDiscount(item.productId.price, item.productId.discount) * 100
+                        unit_amount: priceWithDiscount(item.price, item.discount) * 100
                     },
                     adjustable_quantity: {
                         enabled: true,

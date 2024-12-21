@@ -14,13 +14,13 @@ import { Provider } from "react-redux";
 import { store, persist } from "./app/store";
 import { PersistGate } from "redux-persist/integration/react";
 // index.js / main.js
-import axiosClient from "./Api/axiosClient";
+// import axiosClient from "./Api/axiosClient";
 
-const token = localStorage.getItem("accessToken");
-if (token) {
-  console.log("Token already exists:", token);
-  axiosClient.defaults.headers.Authorization = `Bearer ${token}`;
-}
+// const token = localStorage.getItem("accessToken");
+// if (token) {
+//   console.log("Token already exists:", token);
+//   axiosClient.defaults.headers.Authorization = `Bearer ${token}`;
+// }
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>

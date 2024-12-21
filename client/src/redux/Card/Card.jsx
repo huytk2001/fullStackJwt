@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 function CartFeature() {
   const cartTotal = useSelector(cartTotalSelector);
   const user = useSelector(state=>state.user)
-  console.log("user",user);
+
   
   const items = useSelector(cardItemsSelector);
 

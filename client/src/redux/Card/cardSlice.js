@@ -17,25 +17,7 @@ export const addToCardProduct = async(productId, quantity) => {
         AxiosToastError(error);
     }
 };
-// export const addToCardProduct = async(productId, quantity) => {
-//     try {
-//         console.log("Sending to backend: productId:", productId, "quantity:", quantity);
-//         const res = await CartApi.create({ productId, quantity });
 
-
-
-//         const { data } = res;
-
-//         if (data && data.success) {
-//             toast.success(data.message);
-//             console.log("Backend response:", data);
-//             return data;
-//         }
-//     } catch (error) {
-//         console.error("API Call Error:", error.message);
-//         AxiosToastError(error);
-//     }
-// };
 
 export const fetchCartItems = createAsyncThunk(
     "cart/fetchCartItems",
@@ -59,7 +41,8 @@ export const fetchCartItems = createAsyncThunk(
                                 name: productDetails.name,
                                 price: productDetails.price,
                                 image: productDetails.image,
-                                stock: productDetails.stock
+                                stock: productDetails.stock,
+                                discount: productDetails.discount
                             };
                         } catch (error) {
                             console.error(`Failed to get product ${item.productId}`, error);
@@ -103,14 +86,19 @@ const cardSlice = createSlice({
             );
 
             if (index >= 0) {
-                // Tăng số lượng nếu đã tồn tại
-                state.cartItems[index].quantity += newItem.quantity;
+                state.cartItems[index] = {
+                    ...state.cartItems[index], // Giữ lại các thuộc tính cũ
+                    quantity: state.cartItems[index].quantity + newItem.quantity // Cập nhật số lượng
+                };
+
             } else {
                 // Thêm mới sản phẩm nếu chưa có trong giỏ hàng
                 state.cartItems.push(newItem);
             }
         },
-
+        handleAddItemCart: (state, action) => {
+            state.cartItems = [...action.payload]
+        },
         setQuantity(state, action) {
             const { id, quantity } = action.payload;
             // Check if product is available in card
@@ -175,6 +163,7 @@ export const {
     removeFromCard,
     clearCart,
     increaseQuantity,
-    decreaseQuantity
+    decreaseQuantity,
+    handleAddItemCart
 } = actions;
 export default reducer;

@@ -6,10 +6,12 @@ import { combineReducers } from "redux";
 import userReducer from "../redux/userSlice";
 import cardReducer from "../redux/Card/cardSlice";
 import orderReducer from "../redux/orderSlice"
+import addressReducer from "../redux/addreessSlice"
 const rootReducer = combineReducers({
     user: userReducer,
     card: cardReducer,
-    order: orderReducer
+    order: orderReducer,
+    address: addressReducer
 });
 
 const persistConfig = {

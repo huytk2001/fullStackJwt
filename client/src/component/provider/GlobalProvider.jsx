@@ -2,13 +2,14 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { cardItemsSelector } from "../../redux/Card/selectors";
 import CartApi from "../../Api/cartApi";
-import { addToCard, addToCardProduct } from "../../redux/Card/cardSlice";
+import { addToCard, addToCardProduct, clearCart } from "../../redux/Card/cardSlice";
 import AxiosToastError from "../../redux/AxiosToastError";
 import toast from "react-hot-toast";
 import { PriceWithDiscount } from "../../redux/util/PriceWithDiscount";
 import addressApi from "../../Api/addressApi";
 import orderApi from "../../Api/orderApi";
 import { setOrder } from "../../redux/orderSlice";
+import { handleAddress } from "../../redux/addreessSlice";
 
  export const GlobalContent = createContext(null);
  export const useGlobalContent = ()=> useContext(GlobalContent)
@@ -20,6 +21,8 @@ import { setOrder } from "../../redux/orderSlice";
     const [totalQty,setTotalQty] = useState(0)
     const cartItem = useSelector(cardItemsSelector)
     const user = useSelector(state=> state.user)
+    
+    
     const fetchCartItem = async()=>{
         try {
             const response = await CartApi.get()
@@ -69,23 +72,27 @@ import { setOrder } from "../../redux/orderSlice";
         },0)
         setTotalQty(qty)
         const tprice = cartItem.reduce((preve,curr)=>{
-            const priceAfterDiscount = PriceWithDiscount(curr.productId.price,curr.productId.discount)
+            const priceAfterDiscount = PriceWithDiscount(curr.price,curr.discount)
             return preve +(priceAfterDiscount * curr.quantity)
         },0)
         setTotalPrice(tprice)
 
         const notDiscountPrice = cartItem.reduce((preve,curr)=>{
-            return preve+ (curr.productId.price*curr.quantity)
-        })
+            return preve+ (curr.price*curr.quantity)
+        },0)
         setNotDiscountTotalPrice(notDiscountPrice)
     },[cartItem]
 )
 const fetchAddress = async()=>{
     try {
         const response = await addressApi.getAddress()
-        if(response.success){
-            dispatch(addToCard(response.data))
+      
+        const { data : responseData } = response
+        if(responseData.success){
+         
+            dispatch(handleAddress(response.data.data))
         }
+        
     } catch (error) {
         console.log(error);
         AxiosToastError(error)
@@ -104,13 +111,18 @@ const fetchOrder = async()=>{
         return error
     }
 }
+const handleLogout = ()=>{
+    dispatch(clearCart())
+}
 useEffect(()=>{
     fetchCartItem()
     fetchAddress()
-    fetchOrder()
+    fetchOrder(),
+    handleLogout()
+  
 },[user])
     return(<GlobalContent.Provider value={{
-        fetchCartItem,updatedCartItem,deleteCartItem,fetchAddress,notDiscountTotalPrice
+        fetchCartItem,updatedCartItem,deleteCartItem,fetchAddress,notDiscountTotalPrice, totalQty,totalPrice
     }}>{children}</GlobalContent.Provider>)
  }
  export default GlobalProvider

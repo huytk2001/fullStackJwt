@@ -1,49 +1,39 @@
-import { Cancel } from "axios";
-import { createBrowserRouter, Outlet } from "react-router-dom";
-import ListPageProducts from "../component/Product/ListPageProducts";
+import { createBrowserRouter } from "react-router-dom";
+import App from "../../App";
 import ErrorPage from "../Page/ErrorPage";
-import Home from "../Page/Home";
-import Login from "../Page/Login";
+import { Home } from "@mui/icons-material";
+import ListPageProducts from "../component/Product/ListPageProducts";
 import ProductDetails from "../Page/Product-details";
-import Register from "../Page/Register";
+import CartFeature from "../redux/Card/Card";
 import Success from "../Page/Success";
-import CartFeaTure from "../redux/Card/Card";
+import { Cancel } from "axios";
 import CheckOutPage from "../Page/CheckOutPage";
+import Login from "../Page/Login";
 
-const AuthLayout = () => {
-  return <Outlet />;
-};
 
-export default createBrowserRouter([
+const router = createBrowserRouter([
   {
-    element: <AuthLayout />,
-    errorElement: <ErrorPage />,
-    children: [
+    path:'/',
+    element:<App/>,
+    errorElement:<ErrorPage/>,
+    children:[
+
       {
-        element: <Login />,
-        path: "/login",
+        path:"",
+        element:<Home/>
+      },
+      {path:"/login", element:<Login/>},
+      {
+        element: <ListPageProducts />,
+        path: "product", // Không có dấu `/` ở đầu
       },
       {
-        element: <Register />,
-        path: "/register",
+        element: <ProductDetails />,
+        path: "product-details/:id", // Đặt ngang hàng với `ListPageProducts`
       },
       {
-        element: <Home />,
-        path: "/",
-        children: [
-          {
-            element: <ListPageProducts />,
-            path: "product", // Không có dấu `/` ở đầu
-          },
-          {
-            element: <ProductDetails />,
-            path: "product-details/:id", // Đặt ngang hàng với `ListPageProducts`
-          },
-          {
-            element: <CartFeaTure />,
-            path: "card", // Đặt ngang hàng với `ListPageProducts`
-          },
-        ],
+        element: <CartFeature />,
+        path: "card", // Đặt ngang hàng với `ListPageProducts`
       },
       { element:<Success/>,
         path:"success"
@@ -56,6 +46,7 @@ path:"cancel"
         element:<CheckOutPage/>,
         path:"checkout"
       }
-    ],
-  },
-]);
+    ]
+  }
+])
+export default router
