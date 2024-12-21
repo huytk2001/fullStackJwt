@@ -15,20 +15,21 @@ const ProductDetails = () => {
 
 // const currentQuantityInCart = cartItems.find(item=> item.id === item. );
 
+
 const cartItem = useSelector(cardItemsSelector)
+
 // Debug để kiểm tra cartItem và product._id
-console.log("Cart Items:", cartItem);
-console.log("Product ID:", product._id);
+
 
 // Lấy số lượng hiện tại trong giỏ hàng của sản phẩm hiện tại
 const currentQuantityInCart = cartItem
   .filter(item => String(item.productId) === String(product._id)) // Lọc theo productId
   .reduce((acc, item) => acc + (item.quantity || 0), 0); // Cộng quantity của các item đã lọc
 
-console.log("Current Quantity in Cart:", currentQuantityInCart);
+
 
 const handleAddToCard = async({quantity})=>{
-  console.log("Product details:", product);
+
   try {
     const responseData = await addToCardProduct(product._id,quantity);
     

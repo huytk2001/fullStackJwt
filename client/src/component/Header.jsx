@@ -22,7 +22,7 @@ import {
 import PersonIcon from "@mui/icons-material/Person";
 import { Link, NavLink } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
-import { LogoutUser } from "../redux/userSlice";
+import { logoutDetails, LogoutUser } from "../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +36,8 @@ Header.propTypes = {};
 function Header(props) {
   const currentUser = useSelector((state) => state.user.login.currentUser);
   const isLogginOut = useSelector((state) => state.user.logout.currentUser);
+  const user = useSelector((state) => state.user);
+  console.log("Redux User State:", user);
   const dispatch = useDispatch();
   const negative = useNavigate();
   const cardItemsCount = useSelector(cartItemsCountSelector);
@@ -53,21 +55,11 @@ function Header(props) {
   useEffect(() => {
     dispatch(fetchCartItems()); // Fetch dữ liệu từ API
   }, [dispatch]);
-  // const const anchorRef = React.useRef(null);
-  // let axiosJWT = axios.create();
-  // const refreshToken = async () => {
-  //   try {
-  //     const res = await axios.post("/v1/auth/refresh", {
-  //       withCredentials: true,
-  //     });
-  //     return res.data;
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+
   const handleLogout = () => {
     dispatch(removeFromCard());
-    dispatch(clearCart())
+    dispatch(clearCart()),
+    dispatch(logoutDetails())
     persist.purge();
     dispatch(LogoutUser());
     negative("/");
@@ -112,22 +104,7 @@ function Header(props) {
               </Button>
             </NavLink>
             {currentUser ? (
-              // <Typography variant="h7" sx={{ color: "#fff" }}>
-              //   {currentUser.user.username}
-              //   <MenuList
-              //     keepMounted
-              //     anchorRef={anchorRef}
-              //     id="composition-menu"
-              //     aria-labelledby="composition-button"
-              //     // onKeyDown={handleListKeyDown}
-              //   >
-              //     <MenuItem onClick={handleClose}>Profile</MenuItem>
-              //     <MenuItem onClick={handleClose}>My account</MenuItem>
-              //     <MenuItem disabled={isLogginOut} onClick={handleLogout}>
-              //       Logout
-              //     </MenuItem>
-              //   </MenuList>
-              // </Typography>
+          
               <PopupState variant="popover" popupId="demo-popup-menu">
                 {(popupState) => (
                   <React.Fragment>
@@ -156,11 +133,12 @@ function Header(props) {
               size="large"
               aria-label="show 4 new mails"
               color="inherit"
+              onClick={handleCartClick}
             >
               <Badge
                 badgeContent={cardItemsCount}
                 color="error"
-                onClick={handleCartClick}
+                
               >
                 <ShoppingCart />
               </Badge>

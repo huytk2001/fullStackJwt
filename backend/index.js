@@ -8,6 +8,7 @@ import userRoute from "./route/user.js";
 import productRoute from "./route/product.js";
 import categoryRoute from "./route/category.js";
 import cartRoute from "./route/cartRoute.js";
+import orderRoute from "./route/oderRoute.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,8 +20,8 @@ app.use(cookieParser());
 app.use(express.json());
 // CORS configuration
 const corsOptions = {
-  origin: "http://localhost:5173",
-  credentials: true, // Allow credentials (cookies, Authorization headers, etc.)
+    origin: "http://localhost:5173",
+    credentials: true, // Allow credentials (cookies, Authorization headers, etc.)
 };
 
 app.use(cors(corsOptions));
@@ -29,16 +30,17 @@ app.use("/user", userRoute);
 app.use("/product", productRoute);
 app.use("/category", categoryRoute);
 app.use("/api/cart", cartRoute);
+app.use("/api/order", orderRoute);
 mongoose
-  .connect(URI)
-  .then(() => {
-    console.log("Connected to DB");
+    .connect(URI)
+    .then(() => {
+        console.log("Connected to DB");
 
-    // Start the server after successful DB connection
-    app.listen(PORT, () => {
-      console.log(`🚀 Server ready at http://localhost:${PORT}`);
+        // Start the server after successful DB connection
+        app.listen(PORT, () => {
+            console.log(`🚀 Server ready at http://localhost:${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.error("Error connecting to MongoDB", err);
     });
-  })
-  .catch((err) => {
-    console.error("Error connecting to MongoDB", err);
-  });

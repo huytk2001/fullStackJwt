@@ -28,7 +28,9 @@ const auth = async(request, response, next) => {
             );
         });
 
+
         request.userId = decode.id;
+        console.log("Ddd", request.userId);
         next();
     } catch (error) {
         console.error("Lỗi JWT:", error.message);

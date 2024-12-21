@@ -5,22 +5,23 @@ import { combineReducers } from "redux";
 
 import userReducer from "../redux/userSlice";
 import cardReducer from "../redux/Card/cardSlice";
-
+import orderReducer from "../redux/orderSlice"
 const rootReducer = combineReducers({
-  user: userReducer,
-  card: cardReducer,
+    user: userReducer,
+    card: cardReducer,
+    order: orderReducer
 });
 
 const persistConfig = {
-  key: "root",
-  storage,
-  whitelist: ["user", "card"], // Persist cả user và card reducer
+    key: "root",
+    storage,
+    whitelist: ["user", "card"], // Persist cả user và card reducer
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-  reducer: persistedReducer,
+    reducer: persistedReducer,
 });
 
 const persist = persistStore(store);

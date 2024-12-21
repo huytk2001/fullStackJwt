@@ -11,6 +11,6 @@ userRouter.get("/user", auth, userController.getAllUser);
 userRouter.get("/user/:id", auth, userController.getIdUser);
 
 // Xóa người dùng theo ID (Thêm tiền tố "/user" để rõ ràng)
-userRouter.delete("/user/:id", userController.getDeleteUser);
+userRouter.delete("/user-details", userController.getDeleteUser);
 
 export default userRouter;

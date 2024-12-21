@@ -86,6 +86,50 @@ const cardControllers = {
             });
         }
     },
+    updatedCartUser: async(request, response) => {
+        try {
+            const userId = request.userId
+            const { _id, qty } = request.body
+            if (!_id || !qty) {
+                return response.status(400).json({
+                    message: "Provide id qty"
+                })
+            }
+            const updatedCart = await CartProduct.updateOne({
+                _id: _id,
+                userId: userId
+            }, { quantity: qty })
+            return response.status(200).json(updatedCart)
+        } catch (error) {
+            return response.status(500).json({
+                error: true,
+                message: message.error || error
+            })
+        }
+    },
+    deleteCard: async(request, response) => {
+        try {
+            const userId = req.userId;
+            const { _id } = req.body
+            if (!_id) {
+                return response.status(400).json({
+                    message: "Provide _id",
+                    error: false,
+                    success: true
+                })
+            }
+            const deleteCardItem = await CartProduct.findByIdAndDelete({ _id: _id, userId: userId })
+            return response.status(200).json({
+                message: "Delete Successfully",
+
+            })
+        } catch (error) {
+            return response.status(500).json({
+                error: true,
+                message: message.error || error
+            })
+        }
+    }
 };
 
 export default cardControllers;

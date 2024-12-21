@@ -146,7 +146,7 @@ const cardSlice = createSlice({
             state.cartItems = state.cartItems.filter((x) => x.id !== idNeedToRemove);
         },
         clearCart(state) {
-            state.cartItems == []
+            state.cartItems = []
         }
 
     },

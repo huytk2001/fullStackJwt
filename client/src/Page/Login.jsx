@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
-import { LoginUser } from "../redux/userSlice";
+import {  fetchUserDetail, LoginUser, setUserDetails } from "../redux/userSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
 import LoginFrom from "../Form/loginForm";
@@ -26,6 +26,8 @@ function Login(props) {
       if (user) {
         enqueueSnackbar("Register successfully!!!", { variant: "success" });
         negative("/");
+        const userDetails = await fetchUserDetail()
+        dispatch(setUserDetails(userDetails))
       } else {
         enqueueSnackbar("Login successful but no user data returned (204).", {
           variant: "info",

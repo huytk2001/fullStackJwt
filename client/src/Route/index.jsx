@@ -1,11 +1,14 @@
+import { Cancel } from "axios";
 import { createBrowserRouter, Outlet } from "react-router-dom";
-import ErrorPage from "../Page/ErrorPage";
-import Login from "../Page/Login";
-import Home from "../Page/Home";
-import Register from "../Page/Register";
 import ListPageProducts from "../component/Product/ListPageProducts";
+import ErrorPage from "../Page/ErrorPage";
+import Home from "../Page/Home";
+import Login from "../Page/Login";
 import ProductDetails from "../Page/Product-details";
+import Register from "../Page/Register";
+import Success from "../Page/Success";
 import CartFeaTure from "../redux/Card/Card";
+import CheckOutPage from "../Page/CheckOutPage";
 
 const AuthLayout = () => {
   return <Outlet />;
@@ -42,6 +45,17 @@ export default createBrowserRouter([
           },
         ],
       },
+      { element:<Success/>,
+        path:"success"
+      },
+      {
+element:<Cancel/>,
+path:"cancel"
+      },
+      {
+        element:<CheckOutPage/>,
+        path:"checkout"
+      }
     ],
   },
 ]);
